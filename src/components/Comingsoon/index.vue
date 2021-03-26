@@ -1,19 +1,22 @@
 <template>
     <div class="movie_body">
-        <ul>
-            <li v-for="item in comingList" :key="item.id">
-                <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
-                <div class="info_list">
-                    <h2>{{item.nm}}<img v-if="item.version" src="@/assets/max.png" alt=""></h2>
-                    <p><span class="person">{{item.wish}}</span> 人想看</p>
-                    <p>主演: {{item.star}}</p>
-                    <p>{{item.rt}}上映</p>
-                </div>
-                <div class="btn_pre">
-                    想看
-                </div>
-            </li>
-        </ul>
+        <Loading v-if="isLoading"></Loading>
+        <Scroll v-else>
+            <ul>
+                <li v-for="item in comingList" :key="item.id" @click="handleToDetail(item.id)">
+                    <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+                    <div class="info_list">
+                        <h2>{{item.nm}}<img v-if="item.version" src="@/assets/max.png" alt=""></h2>
+                        <p><span class="person">{{item.wish}}</span> 人想看</p>
+                        <p>主演: {{item.star}}</p>
+                        <p>{{item.rt}}上映</p>
+                    </div>
+                    <div class="btn_pre">
+                        想看
+                    </div>
+                </li>
+            </ul>
+        </Scroll>
     </div>
 </template>
 
@@ -22,19 +25,32 @@ export default {
     name: 'Comingsoon',
     data() {
         return {
-            comingList: []
+            comingList: [],
+            isLoading: true,
+            prdvCityId: -1
         }
     },
-    mounted () {
+    activated () {
+        var cityId = this.$store.state.city.id;
+        // console.log(cityId);
+        if( this.prdvCityId === cityId){return;}
+        this.isLoading = true;
+
         this.axios({
-            url: '/ajax/comingList?ci=10&token=&limit=10'
+            url: `/ajax/comingList?ci=${cityId}&token=&limit=10`
         }).then(res => {
-            var msg = res.statusText;
-            if(msg === "OK"){
+            if(res.statusText === "OK"){
                 this.comingList = res.data.coming
-                console.log(this.comingList)
+                this.isLoading = false;
+                // console.log(this.comingList)
+                this.prdvCityId = cityId;
             }
         })
+    },
+    methods: {
+        handleToDetail(id){
+            this.$router.push(`/movie/detail/2/${id}`);
+        }
     },
 }
 </script>

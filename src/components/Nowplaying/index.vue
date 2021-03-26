@@ -1,11 +1,14 @@
 <template>
-    <div class="movie_body">
+    <div class="movie_body" ref="movieBody">
+        <Loading v-if="isLoading"></Loading>
+        <Scroll v-else :handleToScroll="handleToScroll" :handleToTouchEnd="handleToTouchEnd">
         <ul>
-            <li v-for="item in movieList" :key="item.id">
+            <li v-if="pullDownMsg">{{pullDownMsg}}</li>
+            <li v-for="item in movieList" :key="item.id" @click="handleToDetail(item.id)">
                 <div class="pic_show"><img :src="item.img| setWH('128.180')"></div>
                 <div class="info_list">
                     <h2>{{item.nm}}<img v-if="item.version" src="@/assets/max.png" alt=""></h2>
-                    <p v-if="item.sc">观众评 <span class="grade">{{item.sc}}</span></p>
+                    <p v-if="item.sc">观众评分 <span class="grade">{{item.sc}}</span></p>
                     <p v-else-if="item.wish"><span class="grade">{{item.wish}}</span>人想看</p>
                     <p>主演: {{item.star}}</p>
                     <p>{{item.showInfo}}</p>
@@ -15,38 +18,60 @@
                 </div>
             </li>
         </ul>
+        </Scroll>
     </div>
 </template>
 <script>
+// import BScroll from 'better-scroll'
+
+
 export default {
     name: 'Nowplaying',
     data() {
         return {
-            movieList: []
+            movieList: null,
+            pullDownMsg: '',
+            isLoading: true,
+            prdvCityId: -1
         }
     },
-    mounted () {
+    activated () {
+        var cityId = this.$store.state.city.id;
+        // console.log(cityId);
+        if( this.prdvCityId === cityId){return;}
+        this.isLoading = true;
         this.axios({
-            // url: 'https://m.maizuo.com/gateway?cityId=110100&pageNum=1&pageSize=10&type=1&k=7758474',
-            // headers: {
-            //     'X-Client-Info': '{"a":"3000","ch":"1002","v":"5.0.4","e":"16164252172533949100261377","bc":"110100"}',
-            //     'X-Host': 'mall.film-ticket.film.list'
-        // }
-            url: '/ajax/movieOnInfoList'
+            url: `/ajax/movieOnInfoList?ci=${cityId}`
         }).then(res => {
-            // console.log(res.data.movieList)
-            this.movieList = res.data.movieList;
-            // this.looplist = res.data.data
-            // var msg = res.data.msg;
-            // if(msg === 'ok'){
-            //     var data = res.data.data.cities;
-            //     console.log(data);
-            //     var { cityList , hotList } = this.formatCityList(data);
-            //     this.cityList = cityList;
-            //     this.hotList = hotList;
-            //     console.log(cityList);
-            // }
+            if(res.statusText === "OK"){
+                this.movieList = res.data.movieList;
+                this.isLoading = false;
+                this.prdvCityId = cityId;
+            }
         })
+    },
+    methods: {
+        handleToDetail(id){
+            // console.log(id);
+            this.$router.push(`/movie/detail/1/${id}`)
+        },
+        handleToScroll(){
+            this.pullDownMsg = '正在更新中';
+            // this.movieList = [];
+            this.axios.get(`/ajax/movieOnInfoList?ci=${this.$store.state.city.id}`).then((res)=>{
+                console.log(res);
+                if(res.statusText === "OK"){
+                    this.pullDownMsg = '更新成功';
+                    this.movieList = res.data.movieList;
+                }
+                setTimeout(()=>{
+                    this.pullDownMsg = '';
+                },1000); 
+            });
+        },
+        handleToTouchEnd(pos){
+            console.log("下拉刷新");
+        }
     },
 }
 </script>
