@@ -18,7 +18,10 @@ export default {
         Header,
         Tabar,
         Login
-    }
+    },
+    mounted() {
+
+    },
 }
 </script>
 

@@ -6,6 +6,18 @@ import store from './store'
 import axios from 'axios'
 Vue.prototype.axios = axios;
 
+import Mint from 'mint-ui';
+import 'mint-ui/lib/style.css'
+Vue.use(Mint);
+
+
+
+import Scroll from '@/components/Scroll'
+Vue.component('Scroll' , Scroll);
+
+import Loading from '@/components/Loading'
+Vue.component('Loading' , Loading);
+
 Vue.filter('setWH',(url,arg) => {
   return url.replace(/w\.h/,arg);
 })

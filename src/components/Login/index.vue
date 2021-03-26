@@ -1,5 +1,6 @@
 <template>
-    <div class="login_body">
+<div>
+        <div class="login_body">
         <div>
             <input class="login_text" type="text" placeHolder="账户名/手机号/Email" >
         </div>
@@ -14,6 +15,7 @@
             <a href="#">找回密码</a>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -28,5 +30,5 @@ export default {
 .login_body .login_btn{ height:50px; margin:10px;}
 .login_body .login_btn input{ width:100%; height:100%; background:pink; border-radius: 3px; border:none; display: block; color:white; font-size: 20px;}
 .login_body .login_link{ display: flex; justify-content:space-between;}
-.login_body .login_link a{ text-decoration: none; margin:0 5px; font-size: 12px; color:pink;}
+.login_body .login_link a{ text-decoration: none; margin:0 10px; font-size: 15px; color:pink;}
 </style>
